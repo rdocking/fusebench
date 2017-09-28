@@ -24,13 +24,33 @@ As described above, this is often difficult for RNA-Seq gene fusions, for reason
 
 ### Features
 
-A tool that:
+A tool that is capable of:
 
-- 
+- Importing results from different fusion callers tools (or can convert the results of a set of tools into a common format)
+    - Initial idea: have team members write simple parsers to convert tool output formats to a common standard (most likely [BEDPE](http://bedtools.readthedocs.io/en/latest/content/general-usage.html))
+- From the common file format, aggregating results from different tools into a consensus set
+    - Initial idea: require some level of minimum overlap between features
+    - Handling duplicate or 'synonym' calls might be difficult here
+- Augmenting the consensus set with additional information from the RNA-Seq data set or existing tools
+    - Initial idea: add gene expression data for candidate fusion partners
+    - Initial idea: use Oncofuse?
+- Importing information from existing databases
+    - Initial idea: start from dump of CIViC, filtered for fusions
+    - Initial idea: use ReCount to provide view of how common the fusion junction is in different data sets
+- Review interface
+    - Some kind of dashboard or web view for 'reviewers' to view evidence associated with particular fusions
+- Visualization
+    - TBD
 
 ### Implementation
 
 - Currently, this repository is set up as an R package. The initial idea was to implement most of the components principally in 'tidyverse'-style R, but this is not a hard requirement (it might not make sense for some parts)
+
+### Initial Data Sets
+
+- Synthetic test set containing 9 known fusions (from FusionCatcher)
+- Re-called data from publicly available data sets with known positives
+- TBC - AML cell line RNA-Seq data
 
 ## Component and Similar Projects
 
