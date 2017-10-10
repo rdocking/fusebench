@@ -61,6 +61,7 @@ A tool that is capable of:
 ### Visualization
 
 - IGV, [Ribbon](http://genomeribbon.com/), others?
+- [chimeraViz](https://github.com/stianlagstad/chimeraviz)
 
 ### Annotation
 
