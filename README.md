@@ -71,3 +71,4 @@ A tool that is capable of:
 ### Aggregation
 
 - MetaSV, others?
+- [confFuse](https://www.frontiersin.org/articles/10.3389/fgene.2017.00137/full) - [GitHub link](https://github.com/Zhiqin-HUANG/confFuse)
