@@ -82,6 +82,7 @@ Selected tools include:
 - [Ribbon](http://genomeribbon.com/)
 - Packages like chimeraviz also have visualizations
 - Packages like [circlize](https://github.com/jokergoo/circlize) are adaptable for this (as well as other Bioconductor packages)
+- [svviz](https://github.com/svviz/svviz) - Read visualizer for structural variants
 
 ### Annotation
 
