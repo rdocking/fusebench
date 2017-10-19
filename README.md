@@ -60,15 +60,28 @@ A tool that is capable of:
 
 ### Visualization
 
-- IGV, [Ribbon](http://genomeribbon.com/), others?
-- [chimeraViz](https://github.com/stianlagstad/chimeraviz)
+- [IGV](http://software.broadinstitute.org/software/igv/)
+- [Ribbon](http://genomeribbon.com/)
+- Packages like chimeraviz also have visualizations
+- Packages like [circlize](https://github.com/jokergoo/circlize) are adaptable for this (as well as other Bioconductor packages)
 
 ### Annotation
 
 - OncoFuse, others?
-- Databases: [CIViC](https://civic.genome.wustl.edu/home), others?
+- Databases: 
+    - [CIViC](https://civic.genome.wustl.edu/home)
 
 ### Aggregation
 
-- MetaSV, others?
-- [confFuse](https://www.frontiersin.org/articles/10.3389/fgene.2017.00137/full) - [GitHub link](https://github.com/Zhiqin-HUANG/confFuse)
+- MetaSV
+    - [Bioinformatics Article](https://academic.oup.com/bioinformatics/article-lookup/doi/10.1093/bioinformatics/btv204)
+    - Mainly focused on large-scale structural variants, from tools like Pindel, BreakDancer, CNVnator, BreakSeq2
+- [confFuse](https://www.frontiersin.org/articles/10.3389/fgene.2017.00137/full) 
+    - [GitHub link](https://github.com/Zhiqin-HUANG/confFuse)
+    - [Frontiers in Genetics Article](https://www.frontiersin.org/articles/10.3389/fgene.2017.00137/full)
+- [chimeraviz](https://github.com/stianlagstad/chimeraviz)
+    - [Bioinformatics Application Note](https://academic.oup.com/bioinformatics/article/33/18/2954/3835381/chimeraviz-a-tool-for-visualizing-chimeric-RNA)
+    - [BioConductor](https://bioconductor.org/packages/release/bioc/html/chimeraviz.html)
+    - `chimeraviz` is able to import fusion results from 'nine different fusion-finder tools: deFuse, EricScript, InFusion, JAFFA, FusionCatcher, FusionMap, PRADA, SOAPfuse and STAR-FUSION'
+    - These are imported as R S4 objects. There are then a selection of functions for visualizing and comparing events (from what I can tell the comparison is mostly done at the coordinate level) 
+- MAVIS - BCGSC unpublished tool along similar lines
