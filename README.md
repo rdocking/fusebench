@@ -54,21 +54,61 @@ A tool that is capable of:
 
 ## Component and Similar Projects
 
+### Recent Review Papers
+
+- Comprehensive evaluation of fusion transcript detection algorithms and a meta-caller to combine top performing methods in paired-end RNA-seq data - [PMID: 26582927](https://www.ncbi.nlm.nih.gov/pubmed/26582927)
+- Comparative assessment of methods for the fusion transcripts detection from RNA-Seq data. - [PMID: 26862001](https://www.ncbi.nlm.nih.gov/pubmed/26862001)
+
 ### Fusion Callers
 
-- trans-ABySS, deFuse, FusionCatcher, EricScript, pizzly, etc...
+Selected tools include:
+
+- trans-ABySS
+- deFuse
+- FusionCatcher
+- EricScript
+- pizzly
+- Bellerophontes
+- InFusion
+- JAFFA
+- FusionMap
+- PRADA
+- SOAPfuse 
+- STAR-FUSION
 
 ### Visualization
 
-- IGV, [Ribbon](http://genomeribbon.com/), others?
-- [chimeraViz](https://github.com/stianlagstad/chimeraviz)
+- [IGV](http://software.broadinstitute.org/software/igv/)
+- [Ribbon](http://genomeribbon.com/)
+- Packages like chimeraviz also have visualizations
+- Packages like [circlize](https://github.com/jokergoo/circlize) are adaptable for this (as well as other Bioconductor packages)
+- [svviz](https://github.com/svviz/svviz) - Read visualizer for structural variants
 
 ### Annotation
 
-- OncoFuse, others?
-- Databases: [CIViC](https://civic.genome.wustl.edu/home), others?
+- Computational inference:
+    - [OncoFuse](https://github.com/mikessh/oncofuse)
+        - 'Oncofuse is a framework designed to estimate the oncogenic potential of de-novo discovered gene fusions. It uses several hallmark features and employs a bayesian classifier to provide the probability of a given gene fusion being a driver mutation.'
+        - [PMID: 23956304](https://www.ncbi.nlm.nih.gov/pubmed/23956304)
+- Databases: 
+    - [CIViC](https://civic.genome.wustl.edu/home)
+    - [Database of Genomic Variants](http://dgv.tcag.ca/dgv/app/home)
+    - [Atlas of Genetics and Cytogenetics in Oncology and Haematology](http://atlasgeneticsoncology.org/)
+    - [Tumor Fusion Gene Data Portal](http://54.84.12.177/PanCanFusV2/)
+    - [Recount](https://www.biorxiv.org/content/early/2016/08/08/068478)
+        - Note that this is actually an interface for downloading fusion junctions from many SRA studies
 
 ### Aggregation
 
-- MetaSV, others?
-- [confFuse](https://www.frontiersin.org/articles/10.3389/fgene.2017.00137/full) - [GitHub link](https://github.com/Zhiqin-HUANG/confFuse)
+- MetaSV
+    - [Bioinformatics Article](https://academic.oup.com/bioinformatics/article-lookup/doi/10.1093/bioinformatics/btv204)
+    - Mainly focused on large-scale structural variants, from tools like Pindel, BreakDancer, CNVnator, BreakSeq2
+- [confFuse](https://www.frontiersin.org/articles/10.3389/fgene.2017.00137/full) 
+    - [GitHub link](https://github.com/Zhiqin-HUANG/confFuse)
+    - [Frontiers in Genetics Article](https://www.frontiersin.org/articles/10.3389/fgene.2017.00137/full)
+- [chimeraviz](https://github.com/stianlagstad/chimeraviz)
+    - [Bioinformatics Application Note](https://academic.oup.com/bioinformatics/article/33/18/2954/3835381/chimeraviz-a-tool-for-visualizing-chimeric-RNA)
+    - [BioConductor](https://bioconductor.org/packages/release/bioc/html/chimeraviz.html)
+    - `chimeraviz` is able to import fusion results from 'nine different fusion-finder tools: deFuse, EricScript, InFusion, JAFFA, FusionCatcher, FusionMap, PRADA, SOAPfuse and STAR-FUSION'
+    - These are imported as R S4 objects. There are then a selection of functions for visualizing and comparing events (from what I can tell the comparison is mostly done at the coordinate level) 
+- MAVIS - BCGSC unpublished tool along similar lines
