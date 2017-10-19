@@ -54,9 +54,27 @@ A tool that is capable of:
 
 ## Component and Similar Projects
 
+### Recent Review Papers
+
+- Comprehensive evaluation of fusion transcript detection algorithms and a meta-caller to combine top performing methods in paired-end RNA-seq data - [PMID: 26582927](https://www.ncbi.nlm.nih.gov/pubmed/26582927)
+- Comparative assessment of methods for the fusion transcripts detection from RNA-Seq data. - [PMID: 26862001](https://www.ncbi.nlm.nih.gov/pubmed/26862001)
+
 ### Fusion Callers
 
-- trans-ABySS, deFuse, FusionCatcher, EricScript, pizzly, etc...
+Selected tools include:
+
+- trans-ABySS
+- deFuse
+- FusionCatcher
+- EricScript
+- pizzly
+- Bellerophontes
+- InFusion
+- JAFFA
+- FusionMap
+- PRADA
+- SOAPfuse 
+- STAR-FUSION
 
 ### Visualization
 
@@ -76,6 +94,8 @@ A tool that is capable of:
     - [Database of Genomic Variants](http://dgv.tcag.ca/dgv/app/home)
     - [Atlas of Genetics and Cytogenetics in Oncology and Haematology](http://atlasgeneticsoncology.org/)
     - [Tumor Fusion Gene Data Portal](http://54.84.12.177/PanCanFusV2/)
+    - [Recount](https://www.biorxiv.org/content/early/2016/08/08/068478)
+        - Note that this is actually an interface for downloading fusion junctions from many SRA studies
 
 ### Aggregation
 
