@@ -67,9 +67,15 @@ A tool that is capable of:
 
 ### Annotation
 
-- OncoFuse, others?
+- Computational inference:
+    - [OncoFuse](https://github.com/mikessh/oncofuse)
+        - 'Oncofuse is a framework designed to estimate the oncogenic potential of de-novo discovered gene fusions. It uses several hallmark features and employs a bayesian classifier to provide the probability of a given gene fusion being a driver mutation.'
+        - [PMID: 23956304](https://www.ncbi.nlm.nih.gov/pubmed/23956304)
 - Databases: 
     - [CIViC](https://civic.genome.wustl.edu/home)
+    - [Database of Genomic Variants](http://dgv.tcag.ca/dgv/app/home)
+    - [Atlas of Genetics and Cytogenetics in Oncology and Haematology](http://atlasgeneticsoncology.org/)
+    - [Tumor Fusion Gene Data Portal](http://54.84.12.177/PanCanFusV2/)
 
 ### Aggregation
 
