@@ -38,7 +38,7 @@ def map_fields(input_row, headings):
     gene2 = input_row['Gene_2_symbol(3end_fusion_partner)']
     out_row['name'] = '{G1}-{G2}'.format(G1=gene1, G2=gene2)
 
-    out_row['score'] = '.'
+    out_row['score'] = 0
 
     for heading in headings:
         if (heading not in out_row) and (heading in input_row):
