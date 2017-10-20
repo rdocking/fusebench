@@ -64,7 +64,7 @@ def get_parser():
 
 def main():
     '''
-    Convert FusionCatcher output to BEDPE format.
+    Convert SOAPfuse output to BEDPE format.
     '''
     # Get args
     parser = get_parser()
