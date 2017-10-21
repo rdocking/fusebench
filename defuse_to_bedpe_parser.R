@@ -1,10 +1,19 @@
+#!/usr/bin/env r
 require(tidyverse)
 
 #takes in results.filtered.tsv files from defuse and puts the output in bedpe format, with platform-specific columns following the bedpe columns
 
-defuse_to_bedpe <- function(file){
+# Parse command-line arguments
+options(echo=TRUE)
+args <- commandArgs(trailingOnly = TRUE)
+print(args)
 
-  dat<-read.table(file, sep = "\t", stringsAsFactors=F, header=TRUE)
+input_file <- args[1]
+output_file <- args[2]
+
+defuse_to_bedpe <- function(input_file, output_file){
+
+  dat<-read.table(input_file, sep = "\t", stringsAsFactors=F, header=TRUE)
 
   colnames(dat) <- gsub("gene_strand1", "strand1", colnames(dat))
   colnames(dat) <- gsub("gene_strand2", "strand2", colnames(dat))
@@ -24,6 +33,8 @@ defuse_to_bedpe <- function(file){
   for (i in bedcol){num<-append(num,which(colnames(dat)==i))}
   #reorder columns
   dat <- select(dat, num, which(!colnames(dat) %in% bedcol))
-  outfile <- gsub("...$","bedpe", file )
-  write.csv(dat,outfile, row.names=F)
+  # outfile <- gsub("...$","bedpe", file )
+  write_tsv(dat, output_file)
 }
+
+defuse_to_bedpe(input_file, output_file)
