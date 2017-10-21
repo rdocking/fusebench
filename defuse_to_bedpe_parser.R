@@ -1,8 +1,9 @@
+#!/usr/bin/env r
 require(tidyverse)
 
 #takes in results.filtered.tsv files from defuse and puts the output in bedpe format, with platform-specific columns following the bedpe columns
 
-defuse_to_bedpe <- function(file){
+function(file = commandArgs(TRUE)[1]){
 
   dat<-read.table(file, sep = "\t", stringsAsFactors=F, header=TRUE)
 
