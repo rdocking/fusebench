@@ -1,10 +1,19 @@
+#!/usr/bin/env r
 require(tidyverse)
 require(stringr)
 #takes in chimerseq .csv file from download and puts the output in bedpe format, with platform-specific columns following the bedpe columns
-file <- "ChimerDB3.0_ChimerSeq.csv"
-chimerseq_to_bedpe <- function(file){
 
-  dat<-read.csv(file, stringsAsFactors=F, header=TRUE)
+# Parse command-line arguments
+options(echo=TRUE)
+args <- commandArgs(trailingOnly = TRUE)
+print(args)
+
+input_file <- args[1]
+output_file <- args[2]
+
+chimerseq_to_bedpe <- function(input_file, output_file){
+
+  dat<-read.csv(input_file, stringsAsFactors=F, header=TRUE)
   colnames(dat) <- gsub("H_strand", "strand1", colnames(dat))
   colnames(dat) <- gsub("T_strand", "strand2", colnames(dat))
   colnames(dat) <- gsub("H_chr", "chrom1", colnames(dat))
@@ -39,6 +48,7 @@ chimerseq_to_bedpe <- function(file){
   for (i in bedcol){num<-append(num,which(colnames(dat)==i))}
   #reorder columns
   dat <- select(dat, num, which(!colnames(dat) %in% bedcol))
-  outfile <- gsub("...$","bedpe", file )
-  write.csv(dat,outfile, row.names=F)
+  write.csv(dat,output_file, row.names=F)
 }
+
+chimerseq_to_bedpe(input_file, output_file)
