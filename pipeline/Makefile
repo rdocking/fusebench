@@ -13,9 +13,9 @@ SHELL := /bin/bash -o pipefail
 ##============================================================================
 
 # Set up directories here
-FUSEBENCH = /home/projects/hackseq17_3/fusebench_master
+FUSEBENCH = /home/projects/hackseq17_3/fusebench/
 DATA = /home/projects/hackseq17_3/datasets/
-OUTPUT = /home/projects/hackseq17_3/pipeline_results
+OUTPUT = /home/projects/hackseq17_3/pipeline_results/
 
 run_A34048: run_validator
 
