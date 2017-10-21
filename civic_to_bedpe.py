@@ -1,4 +1,5 @@
 
+
 '''
 Convert EricScript output to BEDPE format.
 
@@ -23,37 +24,36 @@ def map_fields(input_row, headings):
     '''
     out_row = dict()
 
-    [chr1, pos1, strand1 ] = input_row['chr1'], input_row['Breakpoint1'], input_row['strand1']
+    [chr1, start1, end1] = input_row['chromosome'], input_row['start'], input_row['stop']
 
     out_row['chrom1'] = 'chr{num}'.format(num=chr1)
-    if(pos1.isdigit()):
-        out_row['start1'] = int(pos1) - 1
-        out_row['end1'] = int(pos1)
+    if(start1.isdigit() and end1.isdigit()):
+        out_row['start1'] = int(start1)
+        out_row['end1'] = int(end1)
     else:
-        out_row['start1'] = -1
-        out_row['end1'] = -1
+        out_row['start1'] = '.'
+        out_row['end1'] = '.'
 
-    out_row['strand1'] = strand1
+    out_row['strand1'] = '.'
 
-    [chr2, pos2, strand2 ] = input_row['chr2'], input_row['Breakpoint2'], input_row['strand2']
 
-    out_row['chrom2'] = 'chr{num}'.format(num=chr2)
+    [chr2, start2, end2] = input_row['chromosome2'], input_row['start2'], input_row['stop2']
 
-    if(pos2.isdigit()):
-        out_row['start2'] = int(pos2) - 1
-        out_row['end2'] = int(pos2)
+    out_row['chrom2'] = 'chr{num}'.format(num=chr1)
+    if(start2.isdigit() and end2.isdigit()):
+        out_row['start2'] = int(start2)
+        out_row['end2'] = int(end2)
     else:
-        out_row['start2'] = -1
-        out_row['end2'] = -1
+        out_row['start2'] = '.'
+        out_row['end2'] = '.'
 
-    out_row['strand2'] = strand1
+    out_row['strand2'] = '.'
 
-
-    gene1 = input_row['GeneName1']
-    gene2 = input_row['GeneName2']
+    gene1 = input_row['representative_transcript']
+    gene2 = input_row['representative_transcript2']
     out_row['name'] = '{G1}-{G2}'.format(G1=gene1, G2=gene2)
 
-    out_row['score'] = input_row['EricScore']
+    out_row['score'] = 0
 
     for heading in headings:
         if (heading not in out_row) and (heading in input_row):
@@ -66,11 +66,20 @@ def map_fields(input_row, headings):
 def add_fields(bedpe_fields):
     '''Add fields from input to end of BEDPE format'''
     '''Specific to EricScript'''
-    to_add = ['ES', 'EnsembleGene1', 'EnsembleGene2', 'GJS',
-              'GeneExpr1', 'GeneExpr2', 'GeneExpr_Fused'
-              'InfoGene1', 'InfoGene2', 'JunctionSequence', 'US',
-              'crossingreads', 'fusiontype', 'homology', 'mean.insertsize'
-              'spanningreads']
+    to_add = ['ensembl_version',
+              'entrez_id',
+              'gene',
+              'hgvs_expressions',
+              'last_review_date',
+              'reference_bases',
+              'reference_build',
+              'summary',
+              'variant',
+              'variant_bases',
+              'variant_civic_url',
+              'variant_groups',
+              'variant_id',
+              'variant_types']
     return bedpe_fields + to_add
 
 
@@ -101,7 +110,7 @@ def main():
 
             # Output is always BEDPE
             init_fieldnames = ['chrom1', 'start1', 'end1', 'chrom2', 'start2',
-                                'end2', 'name', 'score', 'strand1', 'strand2']
+                               'end2', 'name', 'score', 'strand1', 'strand2']
             fieldnames = add_fields(init_fieldnames)
             writer = csv.DictWriter(outf, fieldnames=fieldnames, delimiter='\t')
             writer.writeheader()
