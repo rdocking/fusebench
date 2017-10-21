@@ -8,7 +8,10 @@ If no <input_file> and/or <output_file> is specified, the file will read/write
 from/to STDIN/STDOUT, allowing for piping into and out of the program.
 '''
 
-import argparse,sys,csv
+import argparse,sys,csv,codecs
+
+sys.stdin = codecs.getreader('utf8')(sys.stdin)
+sys.stdout = codecs.getwriter('utf8')(sys.stdout)
 
 def map_fields(input_row, headings):
     '''
@@ -72,8 +75,8 @@ def main():
     # Get args
     parser = get_parser()
     args = parser.parse_args()
-    with open(args.inf, 'r') if args.inf else sys.stdin as inf:
-        with open(args.outf, 'w') if args.outf else sys.stdout as outf:
+    with open(args.inf, 'rU') if args.inf else sys.stdin as inf:
+        with open(args.outf, 'wb') if args.outf else sys.stdout as outf:
             #
             # Organize I/O
             #
@@ -85,7 +88,8 @@ def main():
             init_fieldnames = ['chrom1', 'start1', 'end1', 'chrom2', 'start2',
                                 'end2', 'name', 'score', 'strand1', 'strand2']
             fieldnames = add_fields(init_fieldnames, reader.fieldnames)
-            writer = csv.DictWriter(outf, fieldnames=fieldnames, delimiter='\t')
+            writer = csv.DictWriter(outf, fieldnames=fieldnames,
+                                    lineterminator='\n', delimiter='\t')
             writer.writeheader()
             for in_row in reader:
                 out_row = map_fields(in_row, fieldnames)
