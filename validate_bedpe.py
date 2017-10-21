@@ -61,7 +61,7 @@ def main():
     parser = get_parser()
     args = parser.parse_args()
     with open(args.inf, 'r') if args.inf else sys.stdin as inf:
-        reader = csv.DictReader(inf, delimiter='\t')
+        reader = csv.DictReader(filter(lambda row: row[0] != '#', inf), delimiter='\t')
 
         # Output is always BEDPE
 
