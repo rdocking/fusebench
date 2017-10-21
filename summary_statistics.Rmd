@@ -1,0 +1,45 @@
+---
+title: "BEDPE Summary Statistics"
+output: html_document
+params: 
+  input_file: FALSE
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(knitr)
+
+# Usage:
+# Rscript -e "rmarkdown::render('summary_statistics.Rmd', params = list(input_file = '$input.txt') 'html_document' '$output.html')"
+```
+
+
+```{r data_import, echo=FALSE, message=FALSE}
+
+BEDPE <- read_tsv(params$input_file) %>%
+  mutate(fusion_span = ifelse(chrom1 == chrom2,
+                              "interchromosomal",
+                              "intrachromosomal")) %>%
+  group_by(fusion_span) %>%
+  mutate(events = n()) 
+```
+
+
+```{r output, echo=FALSE}
+
+output_table <- BEDPE %>%
+  summarise(total_events = nrow(BEDPE),
+            count = min(events),
+            score_mean = mean(score),
+            score_median = median(score),
+            score_range = paste(min(score), "-", max(score), sep=" "))
+
+kable(output_table)
+
+BEDPE %>%
+  ggplot(aes(x=score, fill=fusion_span)) +
+  geom_histogram(position = 'dodge', bins=20) +
+  theme_bw() +
+  ggtitle("Fusion scores")
+
+```
