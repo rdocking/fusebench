@@ -12,10 +12,6 @@ input_file <- args[1]
 output_file <- args[2]
 
 defuse_to_bedpe <- function(input_file, output_file){
-
-  dat<-read.table(input_file, sep = "\t", stringsAsFactors=F, header=TRUE)
-
-defuse_to_bedpe <- function(input_file, output_file){
   
   dat<-read.table(input_file, sep = "\t", stringsAsFactors=F, header=TRUE)
   
