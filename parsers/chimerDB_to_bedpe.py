@@ -107,7 +107,7 @@ def main():
             init_fieldnames = ['chrom1', 'start1', 'end1', 'chrom2', 'start2',
                                 'end2', 'name', 'score', 'strand1', 'strand2', 'oncogene', 'tumorsupressor']
             fieldnames = add_fields(init_fieldnames)
-            writer = csv.DictWriter(outf, fieldnames=fieldnames, delimiter=',')
+            writer = csv.DictWriter(outf, fieldnames=fieldnames, delimiter='\t')
             writer.writeheader()
             for in_row in reader:
                 out_row = map_fields(in_row, fieldnames)
