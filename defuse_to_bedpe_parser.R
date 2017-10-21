@@ -15,6 +15,10 @@ defuse_to_bedpe <- function(input_file, output_file){
 
   dat<-read.table(input_file, sep = "\t", stringsAsFactors=F, header=TRUE)
 
+defuse_to_bedpe <- function(input_file, output_file){
+  
+  dat<-read.table(input_file, sep = "\t", stringsAsFactors=F, header=TRUE)
+  
   colnames(dat) <- gsub("gene_strand1", "strand1", colnames(dat))
   colnames(dat) <- gsub("gene_strand2", "strand2", colnames(dat))
   colnames(dat) <- gsub("gene_chromosome", "chrom", colnames(dat))
@@ -33,8 +37,8 @@ defuse_to_bedpe <- function(input_file, output_file){
   for (i in bedcol){num<-append(num,which(colnames(dat)==i))}
   #reorder columns
   dat <- select(dat, num, which(!colnames(dat) %in% bedcol))
-  # outfile <- gsub("...$","bedpe", file )
   write_tsv(dat, output_file)
 }
 
 defuse_to_bedpe(input_file, output_file)
+
