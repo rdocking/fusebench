@@ -16,9 +16,9 @@ def validate_row(input_row):
     Check if the the row complies with the BEDPE standard
 
     Args:
-        input_row (dict): {'heading': value} mapping for one row in input
+        input_row (dict): {'heading': value} one row in input
     Returns:
-        bool: the return value. True if a valid row false otherwise
+        bool: the return value. true if a valid row false otherwise
     '''
 
     #only read required columns
