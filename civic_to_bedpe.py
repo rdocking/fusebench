@@ -1,10 +1,10 @@
 
 
 '''
-Convert EricScript output to BEDPE format.
+Convert CIViC output to BEDPE format.
 
 Can be run from the commandline with:
-    python fusioncatcher_to_bedpe.py -i <input_file> -o <output_file>
+    python civic_to_bedpe.py -i <input_file> -o <output_file>
 
 If no <input_file> and/or <output_file> is specified, the file will read/write
 from/to STDIN/STDOUT, allowing for piping into and out of the program.
