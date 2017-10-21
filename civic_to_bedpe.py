@@ -65,7 +65,7 @@ def map_fields(input_row, headings):
 
 def add_fields(bedpe_fields):
     '''Add fields from input to end of BEDPE format'''
-    '''Specific to EricScript'''
+    '''Specific to CIViC'''
     to_add = ['ensembl_version',
               'entrez_id',
               'gene',
