@@ -31,8 +31,8 @@ def map_fields(input_row, headings):
         out_row['start1'] = int(start1)
         out_row['end1'] = int(end1)
     else:
-        out_row['start1'] = '.'
-        out_row['end1'] = '.'
+        out_row['start1'] = -1
+        out_row['end1'] = -1
 
     out_row['strand1'] = '.'
 
@@ -44,8 +44,8 @@ def map_fields(input_row, headings):
         out_row['start2'] = int(start2)
         out_row['end2'] = int(end2)
     else:
-        out_row['start2'] = '.'
-        out_row['end2'] = '.'
+        out_row['start2'] = -1
+        out_row['end2'] = -1
 
     out_row['strand2'] = '.'
 
