@@ -1,6 +1,6 @@
 
 '''
-Convert EricScript output to BEDPE format.
+Convert Validate BEDPE format.
 
 Can be run from the commandline with:
     python validate_bedpe.py -i <input_file>
