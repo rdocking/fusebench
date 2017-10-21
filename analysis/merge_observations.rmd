@@ -1,0 +1,157 @@
+---
+title: "Merge Observations"
+author: "R. Docking"
+date: '2017-10-21'
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+## Setup
+
+```{r setup, include=FALSE}
+# Set chunk options
+knitr::opts_chunk$set(
+  fig.path = '../plots/paper-',
+  cache.path = '../cache/report-',
+  dev = c("png","pdf"),
+  fig.width = 6,
+  fig.asp = 0.618,
+  out.width = "70%",
+  fig.align = "center", 
+  dpi = 300,
+  fig.show = 'hold',
+  fig.lp = "fig:",
+  cache = TRUE,
+  par = TRUE,
+  echo = TRUE,
+  results = "hide",
+  message = FALSE,
+  warning = FALSE)
+
+library(knitr)
+library(tidyverse)
+```
+
+What we want to do is merge fusion observations from disparate callers, and note which calls overlap between different callers. Upstream analysis tools have already been used to generate BEDPE-formatted output.
+
+## Import
+
+First, we read in the raw BEDPE output from all the callers:
+
+```{r bedpe_raw}
+# Note - will need to change these hard-coded paths
+defuse.raw <- read_tsv('~/fusebench_scratch/results/A34048.defuse.bedpe')
+defuse.raw$score <- as.character(defuse.raw$score)
+
+ericsript.raw <- read_tsv('~/fusebench_scratch/results/A34048.ericscript.bedpe')
+fusioncatcher.raw <- read_tsv('~/fusebench_scratch/results/A34048.fusioncatcher.bedpe')
+fusioncatcher.raw$score <- as.character(fusioncatcher.raw$score)
+
+pavfinder.raw <- read_tsv('~/fusebench_scratch//results/A34048.pavfinder.bedpe',
+                          comment = '#')
+pavfinder.raw$name <- as.character(pavfinder.raw$name)
+```
+
+To make these data frames a little easier to work with, I'm going to nest down all the non-core fields:
+
+```{r nested_bedpe}
+nest_bedpe <- function(df){
+  df %>%
+  group_by(chrom1, start1, end1, chrom2,
+           start2, end2, name, score, 
+           strand1, strand2) %>%
+  nest(.key = observation_data)
+}
+  
+defuse.nested <- nest_bedpe(defuse.raw)
+defuse.nested$caller <- "defuse"
+ericsript.nested <- nest_bedpe(ericsript.raw)
+ericsript.nested$caller <- "ericscript"
+fusioncatcher.nested <- nest_bedpe(fusioncatcher.raw)
+fusioncatcher.nested$caller <- "fusioncatcher"
+pavfinder.nested <- nest_bedpe(pavfinder.raw)
+pavfinder.nested$caller <- "pavfinder"
+```
+
+Now, each of these data frames should match on their main columns, and contain extra data about the observations in a list-column. 
+
+## Inspect Positive Control
+
+Now let's try to merge things. First, I'll try for just the positive control of the known _KMT2A_ fusion:
+
+```{r merge_kmt2a}
+fusioncatcher.kmt2a.df <- filter(fusioncatcher.nested, name == "KMT2A-MLLT3")
+pavfinder.kmt2a.df <- filter(pavfinder.nested, 
+                             chrom1 == "chr9", chrom2 == "chr11")
+defuse.kmt2a.df <- filter(defuse.nested,
+                          name == "MLL-MLLT3")
+# Ericscript - not there
+```
+
+Note that this isn't simple, even in the positive control case. Here's the raw results for fusioncatcher, pavfinder, defuse:
+
+```{r raw_results, results='asis'}
+fusioncatcher.kmt2a.df %>%
+  select(chrom1:strand2) %>%
+  kable()
+
+pavfinder.kmt2a.df %>%
+  select(chrom1:strand2) %>%
+  kable()
+
+defuse.kmt2a.df %>%
+  select(chrom1:strand2) %>%
+  kable()
+```
+
+Notes:
+
+- Each of these tools reports two separate events
+- The 'chrom1' and 'chrom2' labels aren't necessarily going to be in the same order
+- Coordinates aren't going to be exactly matching either
+
+## Merge Positive Control Calls
+
+Let's find the simplest algorithm that will correctly merge these calls...
+
+```{r simple_merge}
+# Munge things so that the nomenclature is similar, and that the events always occur in the same order
+swap_order <- function(df){
+  df %>%
+    dplyr::rename(chrom1_tmp = chrom2,
+         start1_tmp = start2,
+         end1_tmp = end2,
+         chrom2 = chrom1,
+         start2 = start1,
+         end2 = end1) %>%
+    dplyr::rename(chrom1 = chrom1_tmp,
+                start1 = start1_tmp,
+                end1 = end1_tmp) %>%
+    select(chrom1, start1, end1,
+         chrom2, start2, end2,
+         everything())
+}
+
+defuse.kmt2a.munged.df <- 
+  defuse.kmt2a.df %>%
+  mutate(chrom1 = paste0('chr', chrom1),
+         chrom2 = paste0('chr', chrom2)) %>%
+  swap_order()
+
+fusioncatcher.kmt2a.munged.df <- 
+  fusioncatcher.kmt2a.df %>%
+  swap_order()
+```
+
+First try - but everything into a big table then collapse...
+
+```{r collapse_and_overlap}
+collapsed.df <- bind_rows(
+  defuse.kmt2a.munged.df,
+  pavfinder.kmt2a.df,
+  fusioncatcher.kmt2a.munged.df) %>%
+  arrange(chrom1, chrom2, start1, start2, end1, end2)
+```
+
+Note that the two distinct events are ~500bp apart. 
