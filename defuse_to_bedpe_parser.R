@@ -24,4 +24,6 @@ defuse_to_bedpe <- function(file){
   for (i in bedcol){num<-append(num,which(colnames(dat)==i))}
   #reorder columns
   dat <- select(dat, num, which(!colnames(dat) %in% bedcol))
+  outfile <- gsub("...$","bedpe", file )
+  write.csv(dat,outfile, row.names=F)
 }
