@@ -154,4 +154,16 @@ collapsed.df <- bind_rows(
   arrange(chrom1, chrom2, start1, start2, end1, end2)
 ```
 
-Note that the two distinct events are ~500bp apart. 
+Note that the two distinct events are ~500bp apart. I think I'll just write down the big list as BED and collapse it with BEDtools...
+
+```{r write_raw_bedpe}
+collapsed.df %>%
+  mutate(name = ".",
+         score = 0,
+         strand1 = "+",
+         strand2 = "+") %>%
+  dplyr::select(chrom1:strand2) %>%
+  write_tsv('collapsed.bedpe')
+
+```
+
