@@ -1,8 +1,8 @@
 '''
-Convert SOAPfuse output to BEDPE format.
+Convert Pancreatic Cancer Action Network (PanCan) Database format to BEDPE format.
 
 Can be run from the commandline with:
-    python soapfuse_to_bedpe.py -i <input_file> -o <output_file>
+    python pancan_to_bedpe.py -i <input_file> -o <output_file>
 
 If no <input_file> and/or <output_file> is specified, the file will read/write
 from/to STDIN/STDOUT, allowing for piping into and out of the program.
@@ -25,18 +25,22 @@ def map_fields(input_row, headings):
     '''
     out_row = dict()
 
-    out_row['chrom1'] = input_row['up_chr']
-    out_row['start1'] = input_row['up_Genome_pos'] # assuming 0-based
-    out_row['end1'] = int(input_row['up_Genome_pos']) + 1
-    out_row['strand1'] = input_row['up_strand']
+    out_row['chrom1'] = 'chr{num}'.format(num=input_row['A_chr'])
+    out_row['start1'] = input_row['gene_A_start'] # assuming 0-based
+    out_row['end1'] = int(input_row['gene_A_end'])
 
-    out_row['chrom2'] = input_row['dw_chr']
-    out_row['start2'] = input_row['dw_Genome_pos'] # assuming 0-based
-    out_row['end2'] = int(input_row['dw_Genome_pos']) + 1
-    out_row['strand2'] = input_row['dw_strand']
+    A_strand = int(input_row['A_strand'])
+    out_row['strand1'] = '-' if A_strand == -1 else '+' if A_strand == 1 else '.'
 
-    gene1 = input_row['up_gene']
-    gene2 = input_row['dw_gene']
+    out_row['chrom2'] = 'chr{num}'.format(num=input_row['B_chr'])
+    out_row['start2'] = input_row['gene_B_start'] # assuming 0-based
+    out_row['end2'] = int(input_row['gene_B_end'])
+
+    B_strand = int(input_row['B_strand'])
+    out_row['strand2'] = '-' if B_strand == -1 else '+' if B_strand == 1 else '.'
+
+    gene1 = input_row['Gene_A']
+    gene2 = input_row['Gene_B']
     out_row['name'] = '{G1}-{G2}'.format(G1=gene1, G2=gene2)
 
     out_row['score'] = 0
@@ -51,8 +55,9 @@ def map_fields(input_row, headings):
 
 def add_fields(bedpe_fields):
     '''Add fields from input to end of BEDPE format'''
-    to_add = ['up_loc', 'dw_loc', 'Span_reads_num', 'Junc_reads_num',
-                'Fusion_Type', 'down_fusion_part_frame-shift_or_not']
+    to_add = [ 'WGS', 'Evalue', 'sampleId', 'Junction_B', 'Junction_A', 'id',
+                'centrality','Discordant_n', 'frame', 'phos_A', 'phos_B','tier',
+                'ubiq_A', 'ubiq_B', 'Cancer', 'perfectJSR_n', 'JSR_n']
     return bedpe_fields + to_add
 
 
@@ -67,7 +72,7 @@ def get_parser():
 
 def main():
     '''
-    Convert SOAPfuse output to BEDPE format.
+    Convert PanCan Database file to BEDPE format.
     '''
     # Get args
     parser = get_parser()
