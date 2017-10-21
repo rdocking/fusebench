@@ -10,13 +10,10 @@ print(args)
 
 input_file <- args[1]
 output_file <- args[2]
-<<<<<<< HEAD
-=======
 
 defuse_to_bedpe <- function(input_file, output_file){
 
   dat<-read.table(input_file, sep = "\t", stringsAsFactors=F, header=TRUE)
->>>>>>> 3485793e09fe9465c4ca970da1d13beab438b8af
 
 defuse_to_bedpe <- function(input_file, output_file){
   
@@ -40,12 +37,8 @@ defuse_to_bedpe <- function(input_file, output_file){
   for (i in bedcol){num<-append(num,which(colnames(dat)==i))}
   #reorder columns
   dat <- select(dat, num, which(!colnames(dat) %in% bedcol))
-  # outfile <- gsub("...$","bedpe", file )
   write_tsv(dat, output_file)
 }
 
-<<<<<<< HEAD
 defuse_to_bedpe(input_file, output_file)
-=======
-defuse_to_bedpe(input_file, output_file)
->>>>>>> 3485793e09fe9465c4ca970da1d13beab438b8af
+
