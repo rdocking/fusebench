@@ -1,5 +1,5 @@
 '''
-Convert FusionCatcher output to BEDPE format.
+Convert chimerDB output to BEDPE format.
 
 Can be run from the commandline with:
     python fusioncatcher_to_bedpe.py -i <input_file> -o <output_file>
@@ -74,7 +74,7 @@ def map_fields(input_row, headings):
 
 def add_fields(bedpe_fields):
     '''Add fields from input to end of BEDPE format'''
-    
+
     return bedpe_fields
 
 
@@ -89,7 +89,7 @@ def get_parser():
 
 def main():
     '''
-    Convert FusionCatcher output to BEDPE format.
+    Convert ChimerDB output to BEDPE format.
     '''
     # Get args
     parser = get_parser()
