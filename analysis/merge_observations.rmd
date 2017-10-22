@@ -31,6 +31,7 @@ knitr::opts_chunk$set(
 
 library(knitr)
 library(tidyverse)
+library(glue)
 #library(data.table)
 ```
 
@@ -224,20 +225,32 @@ Suggestions from Bruno et al:
 Quick test of data.table version (crashes when loaded alongside tidyverse - will take a bit more learning as well.)
 
 ```{r test-data-table}
-left.df <- defuse.kmt2a.munged.coords.df
-left.df$caller <- "defuse"
-right.df <- fusioncatcher.kmt2a.munged.coords.df
-right.df$caller <- "fusioncatcher"
+left.df <- defuse.kmt2a.munged.coords.df %>%
+  mutate(caller = "defuse",
+         event_id = glue("{chrom1}:{start1}-{end1}/{chrom2}:{start2}-{end2}"))
+
+right.df <- fusioncatcher.kmt2a.munged.coords.df %>%
+    mutate(caller = "fusioncatcher",
+         event_id = glue("{chrom1}:{start1}-{end1}/{chrom2}:{start2}-{end2}"))
 
 write_tsv(left.df, "left.tsv")
 write_tsv(right.df, "right.tsv")
 ```
 
-Getting crashes with data.table - one more time..
+Try to do this without a giant for-loop:
 
-```{r data-table}
-library(data.table)
+```{r compare-left-right}
+left.nested.df <- 
+  left.df %>%
+  group_by(caller, event_id) %>%
+  nest()
 
+right.nested.df <- 
+  right.df %>%
+  group_by(caller, event_id) %>%
+  nest()
 ```
+
+Nope - I think this is the wrong direction too. Quick check of GenomicRanges... OK - this is most likely the way to do it, but I don't think I'll have time.
 
 
