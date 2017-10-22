@@ -1,9 +1,8 @@
-
 '''
-Convert EricScript output to BEDPE format.
+Convert StarFusion output to BEDPE format.
 
 Can be run from the commandline with:
-    python fusioncatcher_to_bedpe.py -i <input_file> -o <output_file>
+    python star_fusion_to_bdpe.py -i <input_file> -o <output_file>
 
 If no <input_file> and/or <output_file> is specified, the file will read/write
 from/to STDIN/STDOUT, allowing for piping into and out of the program.
@@ -23,37 +22,21 @@ def map_fields(input_row, headings):
     '''
     out_row = dict()
 
-    [chr1, pos1, strand1 ] = input_row['chr1'], input_row['Breakpoint1'], input_row['strand1']
-
-    out_row['chrom1'] = 'chr{num}'.format(num=chr1)
-    if(pos1.isdigit()):
-        out_row['start1'] = int(pos1)
-        out_row['end1'] = int(pos1)
-    else:
-        out_row['start1'] = -1
-        out_row['end1'] = -1
-
+    [chr1, pos1, strand1] = input_row['LeftBreakpoint'].split(':')
+    out_row['chrom1'] = chr1
+    out_row['start1'] = int(pos1) - 1 # FIXME: check if this is 1-based
+    out_row['end1'] = pos1
     out_row['strand1'] = strand1
 
-    [chr2, pos2, strand2 ] = input_row['chr2'], input_row['Breakpoint2'], input_row['strand2']
+    [chr2, pos2, strand2] = input_row['RightBreakpoint'].split(':')
+    out_row['chrom2'] = chr2
+    out_row['start2'] = int(pos2) - 1 # FIXME: check if 1-based
+    out_row['end2'] = pos2
+    out_row['strand2'] = strand2
 
-    out_row['chrom2'] = 'chr{num}'.format(num=chr2)
+    out_row['name'] = input_row['#FusionName']
 
-    if(pos2.isdigit()):
-        out_row['start2'] = int(pos2) - 1
-        out_row['end2'] = int(pos2)
-    else:
-        out_row['start2'] = -1
-        out_row['end2'] = -1
-
-    out_row['strand2'] = strand1
-
-
-    gene1 = input_row['GeneName1']
-    gene2 = input_row['GeneName2']
-    out_row['name'] = '{G1}-{G2}'.format(G1=gene1, G2=gene2)
-
-    out_row['score'] = input_row['EricScore']
+    out_row['score'] = 0
 
     for heading in headings:
         if (heading not in out_row) and (heading in input_row):
@@ -65,12 +48,11 @@ def map_fields(input_row, headings):
 
 def add_fields(bedpe_fields):
     '''Add fields from input to end of BEDPE format'''
-    '''Specific to EricScript'''
-    to_add = ['ES', 'EnsembleGene1', 'EnsembleGene2', 'GJS',
-              'GeneExpr1', 'GeneExpr2', 'GeneExpr_Fused'
-              'InfoGene1', 'InfoGene2', 'JunctionSequence', 'US',
-              'crossingreads', 'fusiontype', 'homology', 'mean.insertsize'
-              'spanningreads']
+    to_add = ["JunctionReadCount", "SpanningFragCount",
+              "SpliceType", "LeftGene", "RightGene",
+              "LargeAnchorSupport", "LeftBreakDinuc",
+              "LeftBreakEntropy", "RightBreakDinuc",
+              "RightBreakEntropy", "J_FFPM", "S_FFPM"]
     return bedpe_fields + to_add
 
 
@@ -85,7 +67,7 @@ def get_parser():
 
 def main():
     '''
-    Convert FusionCatcher output to BEDPE format.
+    Convert StarFusion output to BEDPE format.
     '''
     # Get args
     parser = get_parser()

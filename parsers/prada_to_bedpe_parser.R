@@ -41,6 +41,8 @@ prada_to_bedpe <- function(input_file, output_file){
   #gene fusion name
   dat <- unite(dat, name, Gene_A, Gene_B, sep = "-")
   dat <- select(dat, -gene1)
+  dat$chrom1 <- str_c("chr",dat$chrom1)
+  dat$chrom2 <- str_c("chr",dat$chrom2)
   #order of bedpe columns
   bedcol <- c('chrom1', 'start1', 'end1', 'chrom2', 'start2', 'end2', 'name', 'score', 'strand1', 'strand2')
   #get column numbers to reorder

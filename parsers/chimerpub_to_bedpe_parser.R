@@ -37,7 +37,7 @@ chimerpub_to_bedpe <- function(input_file, output_file){
   #reorder columns
   colnames(dat)[1] <- "id"
   dat <- select(dat, num, which(!colnames(dat) %in% bedcol)) %>% select(-id, -h_gene, -t_gene)
-  write.csv(dat,output_file, row.names=F)
+  write.table(dat,output_file, sep = "\t")
 }
 
 chimerpub_to_bedpe(input_file, output_file)

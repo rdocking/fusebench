@@ -43,7 +43,7 @@ def map_fields(input_row, headings):
     gene2 = input_row['Gene_B']
     out_row['name'] = '{G1}-{G2}'.format(G1=gene1, G2=gene2)
 
-    out_row['score'] = 0
+    out_row['score'] = input_row['centrality']
 
     for heading in headings:
         if (heading not in out_row) and (heading in input_row):
@@ -56,8 +56,8 @@ def map_fields(input_row, headings):
 def add_fields(bedpe_fields):
     '''Add fields from input to end of BEDPE format'''
     to_add = [ 'WGS', 'Evalue', 'sampleId', 'Junction_B', 'Junction_A', 'id',
-                'centrality','Discordant_n', 'frame', 'phos_A', 'phos_B','tier',
-                'ubiq_A', 'ubiq_B', 'Cancer', 'perfectJSR_n', 'JSR_n']
+                'Discordant_n', 'frame', 'phos_A', 'phos_B','tier','ubiq_A',
+                'ubiq_B', 'Cancer', 'perfectJSR_n', 'JSR_n']
     return bedpe_fields + to_add
 
 
