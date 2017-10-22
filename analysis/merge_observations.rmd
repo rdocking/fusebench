@@ -1,0 +1,256 @@
+---
+title: "Merge Observations"
+author: "R. Docking"
+date: '2017-10-21'
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+## Setup
+
+```{r setup, include=FALSE}
+# Set chunk options
+knitr::opts_chunk$set(
+  fig.path = '../plots/paper-',
+  cache.path = '../cache/report-',
+  dev = c("png","pdf"),
+  fig.width = 6,
+  fig.asp = 0.618,
+  out.width = "70%",
+  fig.align = "center", 
+  dpi = 300,
+  fig.show = 'hold',
+  fig.lp = "fig:",
+  cache = TRUE,
+  par = TRUE,
+  echo = TRUE,
+  results = "hide",
+  message = FALSE,
+  warning = FALSE)
+
+library(knitr)
+library(tidyverse)
+library(glue)
+#library(data.table)
+```
+
+What we want to do is merge fusion observations from disparate callers, and note which calls overlap between different callers. Upstream analysis tools have already been used to generate BEDPE-formatted output.
+
+## Import
+
+First, we read in the raw BEDPE output from all the callers:
+
+```{r bedpe_raw}
+# Note - will need to change these hard-coded paths
+defuse.raw <- read_tsv('~/fusebench_scratch/results/A34048.defuse.bedpe')
+ericsript.raw <- read_tsv('~/fusebench_scratch/results/A34048.ericscript.bedpe')
+fusioncatcher.raw <- read_tsv('~/fusebench_scratch/results/A34048.fusioncatcher.bedpe')
+pavfinder.raw <- read_tsv('~/fusebench_scratch//results/A34048.pavfinder.bedpe',
+                          comment = '#')
+```
+
+To make these data frames a little easier to work with, I'm going to nest down all the non-core fields:
+
+```{r nested_bedpe}
+nest_bedpe <- function(df){
+  df %>%
+  group_by(chrom1, start1, end1, chrom2,
+           start2, end2, name, score, 
+           strand1, strand2) %>%
+  nest(.key = observation_data)
+}
+  
+defuse.nested <- nest_bedpe(defuse.raw)
+defuse.nested$caller <- "defuse"
+ericsript.nested <- nest_bedpe(ericsript.raw)
+ericsript.nested$caller <- "ericscript"
+fusioncatcher.nested <- nest_bedpe(fusioncatcher.raw)
+fusioncatcher.nested$caller <- "fusioncatcher"
+pavfinder.nested <- nest_bedpe(pavfinder.raw)
+pavfinder.nested$caller <- "pavfinder"
+```
+
+Now, each of these data frames should match on their main columns, and contain extra data about the observations in a list-column. 
+
+## Inspect Positive Control
+
+Now let's try to merge things. First, I'll try for just the positive control of the known _KMT2A_ fusion:
+
+```{r merge_kmt2a}
+fusioncatcher.kmt2a.df <- filter(fusioncatcher.nested, name == "KMT2A-MLLT3")
+pavfinder.kmt2a.df <- filter(pavfinder.nested, 
+                             chrom1 == "chr9", chrom2 == "chr11")
+defuse.kmt2a.df <- filter(defuse.nested,
+                          name == "MLL-MLLT3")
+# Ericscript - not there
+```
+
+Note that this isn't simple, even in the positive control case. Here's the raw results for fusioncatcher, pavfinder, defuse:
+
+```{r raw_results, results='asis'}
+fusioncatcher.kmt2a.df %>%
+  select(chrom1:strand2) %>%
+  kable()
+
+pavfinder.kmt2a.df %>%
+  select(chrom1:strand2) %>%
+  kable()
+
+defuse.kmt2a.df %>%
+  select(chrom1:strand2) %>%
+  kable()
+```
+
+Notes:
+
+- Each of these tools reports two separate events
+- The 'chrom1' and 'chrom2' labels aren't necessarily going to be in the same order
+- Coordinates aren't going to be exactly matching either
+
+## Merge Positive Control Calls
+
+Let's find the simplest algorithm that will correctly merge these calls...
+
+```{r simple_merge}
+# Munge things so that the nomenclature is similar, and that the events always occur in the same order
+swap_order <- function(df){
+  df %>%
+    dplyr::rename(chrom1_tmp = chrom2,
+         start1_tmp = start2,
+         end1_tmp = end2,
+         chrom2 = chrom1,
+         start2 = start1,
+         end2 = end1) %>%
+    dplyr::rename(chrom1 = chrom1_tmp,
+                start1 = start1_tmp,
+                end1 = end1_tmp) %>%
+    select(chrom1, start1, end1,
+         chrom2, start2, end2,
+         everything())
+}
+
+defuse.kmt2a.munged.df <- 
+  defuse.kmt2a.df %>%
+  mutate(chrom1 = paste0('chr', chrom1),
+         chrom2 = paste0('chr', chrom2)) %>%
+  swap_order()
+
+fusioncatcher.kmt2a.munged.df <- 
+  fusioncatcher.kmt2a.df %>%
+  swap_order()
+```
+
+First try - but everything into a big table then collapse...
+
+```{r collapse_and_overlap}
+# Get just the coordinates
+defuse.kmt2a.munged.coords.df <- 
+  select(defuse.kmt2a.munged.df, chrom1:end2)
+pavfinder.kmt2a.coords.df <- 
+  select(pavfinder.kmt2a.df, chrom1:end2)
+fusioncatcher.kmt2a.munged.coords.df <- 
+  select(fusioncatcher.kmt2a.munged.df, chrom1:end2)
+
+collapsed.df <- bind_rows(
+  defuse.kmt2a.munged.coords.df,
+  pavfinder.kmt2a.coords.df,
+  fusioncatcher.kmt2a.munged.coords.df) %>%
+  arrange(chrom1, chrom2, start1, start2, end1, end2)
+```
+
+Note that the two distinct events are ~500bp apart. I think I'll just write down the big list as BED and collapse it with BEDtools...
+
+```{r write_raw_bedpe}
+# Write a single collapsed BEDPE
+collapsed.df %>%
+  mutate(name = ".",
+         score = 0,
+         strand1 = "+",
+         strand2 = "+") %>%
+  dplyr::select(chrom1:strand2) %>%
+  write_tsv('collapsed.bedpe')
+```
+
+OK - we want to get down to the two distinct sets of coordinates here. We need to allow for some slop (only 1bp in this case), but even the bit of mismatch means we can't just 'filter' this down. 
+
+```{r filter_loop}
+# Write a simple matching function
+match_events <- function(chrom1a, start1a, end1a, 
+                         chrom2a, start2a, end2a,
+                         chrom1b, start1b, end1b, 
+                         chrom2b, start2b, end2b,
+                         slop = 10){
+  ret <- (
+  chrom1a == chrom1b &
+    chrom2a == chrom2b &
+    abs(start1a - start1b) <= slop &
+    abs(end1a - end1b <= slop) &
+    abs(start2a - start2b) <= slop &
+    abs(end2a - end2b <= slop))
+  return(ret)
+}
+
+# Test matching function for test cases
+match_events(
+  chrom1a = "chr9", start1a = 20365741, end1a = 20365742,
+  chrom2a = "chr11", start2a = 118355028, end2a = 118355029,
+  chrom1b = "chr9", start1b = 20365741, end1b = 20365742,
+  chrom2b = "chr11", start2b = 118355028, end2b = 118355029
+)
+# TRUE
+
+match_events(
+  chrom1a = "chr9", start1a = 20365741, end1a = 20365742,
+  chrom2a = "chr11", start2a = 118355028, end2a = 118355029,
+  chrom1b = "chr9", start1b = 20365741, end1b = 20365742,
+  chrom2b = "chr11", start2b = 118355690, end2b = 118355691
+)
+# FALSE
+```
+
+Now, try to apply this function across events...
+
+```{r merge_loop}
+
+```
+
+Suggestions from Bruno et al:
+
+- GenomicRanges / IRanges could do it - a bit heavy for now
+- data.table has an foverlap syntax that might be what we want
+  - This is `foverlaps` - we can add in the 'slop' beforehand, so we don't need to use the (not implemented) `maxoverlap` feature.
+- Not sure there's a straightforward way to do this with a dplyr join
+
+Quick test of data.table version (crashes when loaded alongside tidyverse - will take a bit more learning as well.)
+
+```{r test-data-table}
+left.df <- defuse.kmt2a.munged.coords.df %>%
+  mutate(caller = "defuse",
+         event_id = glue("{chrom1}:{start1}-{end1}/{chrom2}:{start2}-{end2}"))
+
+right.df <- fusioncatcher.kmt2a.munged.coords.df %>%
+    mutate(caller = "fusioncatcher",
+         event_id = glue("{chrom1}:{start1}-{end1}/{chrom2}:{start2}-{end2}"))
+
+write_tsv(left.df, "left.tsv")
+write_tsv(right.df, "right.tsv")
+```
+
+Try to do this without a giant for-loop:
+
+```{r compare-left-right}
+left.nested.df <- 
+  left.df %>%
+  group_by(caller, event_id) %>%
+  nest()
+
+right.nested.df <- 
+  right.df %>%
+  group_by(caller, event_id) %>%
+  nest()
+```
+
+Nope - I think this is the wrong direction too. Quick check of GenomicRanges... OK - this is most likely the way to do it, but I don't think I'll have time.
+
+
