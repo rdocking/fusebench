@@ -119,7 +119,7 @@ cosmic_table <- read_tsv(input_file) %>%
   mutate(end1 = temp$end1 ) %>%
   mutate(chrom1 = temp$chrom1) %>%
   mutate(strand1 = temp$strand1) %>%
-  mutate(trans1 = temp$trans1)
+  mutate(trans1 = temp$trans1) %>%
   mutate(start2 = temp$start2 ) %>%
   mutate(end2 = temp$end2 ) %>%
   mutate(chrom2 = temp$chrom2) %>%
