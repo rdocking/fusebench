@@ -1,0 +1,108 @@
+---
+title: "Plots"
+author: "Erica Acton"
+date: "October 22, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(UpSetR)
+library(tidyverse)
+library(reshape2)
+library(knitr)
+```
+
+The purpose of this scipt is to explore possible plots for merged bedpe outputs. Note: This is with fake data until the pipeline is complete.
+
+```{r data}
+anno <- read.table("ChimerDB3.0_ChimerSeq.bedpe", sep = "\t",row.names=1)
+
+callers <- c("deFuse", "fusioncatcher", "ericscript", "fusionmap", "jaffa", "infusion", "prada", "soapfuse", "starfusion", "pancan")
+
+db <- c("civic", "chimerdb", "chimerpub", "chimerseq", "cosmic")
+```
+
+
+To look at the overlap between callers on a gene-fusion basis:
+```{r}
+fus <- as.character(anno$name)
+m <- 46492
+n <- 10
+mat <- matrix(sample(0:1, m * n, replace = TRUE), m, n)
+
+
+dat <- data.frame(mat)
+colnames(dat) <- callers
+
+dat$Identifier <- fus
+dat <- dat[,c(11,1:10)]
+
+
+mdat2 <- melt(dat)
+mdat2 <- mdat2 %>% group_by(Identifier, variable) 
+a <- summarize(mdat2,sum = sum(value))
+a[a$sum>1,]
+
+sub <- filter(mdat2, Identifier == "SETD2-CCDC12" | Identifier == "ABL1-NUP214")
+ggplot(sub, aes(y=value, x=variable)) + geom_bar(stat="identity", fill = "blue") + theme_minimal()+ theme(axis.text.x = element_text(angle = 90, hjust = 1)) + ylab("# Number of Fusions Found") + xlab("Fusion Callers") + scale_fill_discrete(name="Annotation DB") + facet_grid(~Identifier)
+
+#color by fusion
+ggplot(sub, aes(y=value, x=variable, fill=Identifier)) + geom_bar(stat="identity") + theme_minimal()+ theme(axis.text.x = element_text(angle = 90, hjust = 1)) + ylab("# Number of Fusions Found") + xlab("Fusion Callers") + scale_fill_discrete(name="Annotation DB") + facet_grid(~Identifier) + guides(fill=FALSE)
+
+sub <- filter(mdat2, Identifier == "SETD2-CCDC12" | Identifier == "ABL1-NUP214"| Identifier == "TMPRSS2-ERG"|Identifier == "MLL3-TPTE")
+ggplot(sub, aes(y=value, x=variable, fill = Identifier)) + geom_bar(stat="identity") + theme_minimal()+ theme(axis.text.x = element_text(angle = 90, hjust = 1)) + ylab("# Number of Fusions Found") + xlab("Fusion Callers") + scale_fill_discrete(name="Annotation DB") + facet_wrap(~Identifier) + guides(fill = FALSE)
+
+```
+
+To look at the overlap between callers in general with upset plots.
+
+
+```{r}
+fus <- as.character(unique(anno$name[1:3000]))
+fus <- fus[1:50]
+m <- 50
+n <- 10
+mat <- matrix(sample(0:1, m * n, replace = TRUE), m, n)
+
+
+dat <- data.frame(mat)
+colnames(dat) <- callers
+
+dat$Identifier <- fus
+dat <- dat[,c(11,1:10)]
+
+upset(dat, sets = colnames(dat)[2:10], sets.bar.color = "#56B4E9",
+      order.by = "freq", empty.intersections = "off")
+```
+
+To look at the overlap between gene fusions in the annotation databases:
+
+
+```{r}
+
+m <- 50
+n <- 5
+mat <- matrix(sample(0:1, m * n, replace = TRUE), m, n)
+
+
+dat <- data.frame(mat)
+colnames(dat) <- db
+
+dat$Identifier <- fus
+dat <- dat[,c(6,1:5)]
+
+upset(dat, sets = colnames(dat)[2:6], sets.bar.color = "#56B4E9",
+      order.by = "freq", empty.intersections = "off")
+
+```
+
+
+
+
+
+
+
+
+
+
