@@ -27,7 +27,7 @@ def map_fields(input_row, headings):
 
     out_row['chrom1'] = 'chr{num}'.format(num=chr1)
     if(pos1.isdigit()):
-        out_row['start1'] = int(pos1) - 1
+        out_row['start1'] = int(pos1)
         out_row['end1'] = int(pos1)
     else:
         out_row['start1'] = -1
